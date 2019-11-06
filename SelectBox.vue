@@ -116,9 +116,38 @@ export default {
 <style>
 #custom-select {
 	transition: background-color 0.3s ease-out;
+	transition: border-color 0.2s ease-in;
 }
 .this-select-label {
 	transition: color 0.5s ease-out;
 	transition: font-weight 0.2s ease;
+}
+
+/* Enter and leave animations can use different */
+/* durations and timing functions.              */
+.fade-left-enter-active {
+	transition: all 0.3s ease-out;
+}
+.fade-left-leave-active {
+	transition: all 0.2s ease-in;
+}
+.fade-left-enter, .fade-left-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+	transform: translateX(20px);
+	opacity: 0;
+}
+
+/* Enter and leave animations can use different */
+/* durations and timing functions.              */
+.fade-right-enter-active {
+	transition: all 0.3s ease-out;
+}
+.fade-right-leave-active {
+	transition: all 0.2s ease-in;
+}
+.fade-right-enter, .fade-right-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+	transform: translateX(-20px);
+	opacity: 0;
 }
 </style>

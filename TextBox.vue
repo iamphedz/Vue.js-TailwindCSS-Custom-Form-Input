@@ -25,10 +25,10 @@
 						v-bind:class="{ 'text-red-600': inputError.length > 0 }"
 						@focus="active = true"
 						@focusout="validateOnBlur($event)"
-						@keypress="inputError = ''"
+						@keyup="inputError = ''"
 						v-bind:value="value"
 						v-on:input="$emit('input', $event.target.value)"
-						rows="3"
+						rows="2"
 					/>
 				</div>
 			</div>
@@ -65,7 +65,8 @@ export default {
 		activeLabel() {
 			return {
 				"text-xs font-semibold": this.active,
-				"text-base mt-7": !this.active && !this.hasInput,
+				"text-base bottom-0 mb-1 md:mb-0":
+					!this.active && String(this.value).length < 1,
 				"text-red-600": this.inputError.length > 0,
 				"text-blue-500": this.inputError.length < 1 && this.active,
 				"text-gray-500": this.inputError.length < 1 && !this.active
@@ -87,7 +88,7 @@ export default {
 	methods: {
 		validateOnBlur(event) {
 			this.active = false;
-			if (this.inputError.length > 0) {
+			if (this.inputError.length > 0 && String(this.value).length > 0) {
 				this.inputError = "";
 			}
 		}
@@ -116,11 +117,40 @@ export default {
 <style>
 #custom-input {
 	transition: background-color 0.3s ease-out;
+	transition: border-color 0.2s ease-in;
 }
 .this-input-label {
 	transition: all 0.2s ease;
 }
 .this-text {
 	resize: none;
+}
+
+/* Enter and leave animations can use different */
+/* durations and timing functions.              */
+.fade-left-enter-active {
+	transition: all 0.3s ease-out;
+}
+.fade-left-leave-active {
+	transition: all 0.2s ease-in;
+}
+.fade-left-enter, .fade-left-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+	transform: translateX(20px);
+	opacity: 0;
+}
+
+/* Enter and leave animations can use different */
+/* durations and timing functions.              */
+.fade-right-enter-active {
+	transition: all 0.3s ease-out;
+}
+.fade-right-leave-active {
+	transition: all 0.2s ease-in;
+}
+.fade-right-enter, .fade-right-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+	transform: translateX(-20px);
+	opacity: 0;
 }
 </style>

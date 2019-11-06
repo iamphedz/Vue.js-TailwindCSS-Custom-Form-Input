@@ -1,7 +1,7 @@
 <template>
 	<div
 		id="custom-input"
-		class="flex flex-row w-full items-center rounded-t mb-6 px-1 border-b focus-within:bg-gray-200"
+		class="flex flex-row items-center rounded-t mb-6 px-1 border-b focus-within:bg-gray-200"
 		v-bind:class="{
 			'border-blue-400': active && inputError.length < 1,
 			'border-red-600': active && inputError.length > 0
@@ -19,14 +19,16 @@
 				<div class="flex flex-row w-full">
 					<input
 						v-bind:id="name"
-						v-bind:type="type"
+						v-bind:type="type === 'currency' ? 'number' : type"
 						v-bind:name="name"
+						v-bind:maxlength="maxlength"
+						v-bind:step="type === 'currency' ? '.01' : 'any'"
 						:required="required"
 						class="this-input bg-transparent focus:outline-none mt-6 z-20 w-full"
 						v-bind:class="{ 'text-red-600': inputError.length > 0 }"
 						@focus="active = true"
 						@focusout="validateOnBlur($event)"
-						@keypress="inputError = ''"
+						@keyup="inputError = ''"
 						v-bind:value="value"
 						v-on:input="$emit('input', $event.target.value)"
 					/>
@@ -65,7 +67,10 @@ export default {
 		activeLabel() {
 			return {
 				"text-xs font-semibold": this.active,
-				"text-base mt-7": !this.active && !this.hasInput,
+				"text-base mt-7":
+					!this.active &&
+					String(this.value).length < 1 &&
+					!this.inputError,
 				"text-red-600": this.inputError.length > 0,
 				"text-blue-500": this.inputError.length < 1 && this.active,
 				"text-gray-500": this.inputError.length < 1 && !this.active
@@ -78,16 +83,12 @@ export default {
 	watch: {
 		error() {
 			this.inputError = this.error ? this.error[0] : "";
-		},
-		value() {
-			if (this.value.length > 0) this.hasInput = true;
-			else this.hasInput = false;
 		}
 	},
 	methods: {
 		validateOnBlur(event) {
 			this.active = false;
-			if (this.inputError.length > 0) {
+			if (this.inputError.length > 0 && String(this.value).length > 0) {
 				this.inputError = "";
 			}
 		}
@@ -115,15 +116,50 @@ export default {
 		},
 		required: String,
 		error: Array,
-		value: String
+		maxlength: {
+			type: Number | String,
+			default() {
+				return 20;
+			}
+		},
+		value: String | Number
 	}
 };
 </script>
 <style>
 #custom-input {
 	transition: background-color 0.3s ease-out;
+	transition: border-color 0.2s ease-in;
 }
 .this-input-label {
 	transition: all 0.2s ease;
+}
+
+/* Enter and leave animations can use different */
+/* durations and timing functions.              */
+.fade-left-enter-active {
+	transition: all 0.3s ease-out;
+}
+.fade-left-leave-active {
+	transition: all 0.2s ease-in;
+}
+.fade-left-enter, .fade-left-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+	transform: translateX(20px);
+	opacity: 0;
+}
+
+/* Enter and leave animations can use different */
+/* durations and timing functions.              */
+.fade-right-enter-active {
+	transition: all 0.3s ease-out;
+}
+.fade-right-leave-active {
+	transition: all 0.2s ease-in;
+}
+.fade-right-enter, .fade-right-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+	transform: translateX(-20px);
+	opacity: 0;
 }
 </style>
