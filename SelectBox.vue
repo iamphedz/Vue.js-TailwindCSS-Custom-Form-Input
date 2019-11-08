@@ -1,41 +1,46 @@
 <template>
-  <div
-    id="custom-select"
-    class="flex flex-row w-full items-center rounded-t mb-6 px-1 border-b focus-within:bg-gray-200"
-    v-bind:class="{
+  <div class="relative flex flex-col mb-6">
+    <div
+      id="custom-select"
+      class="flex flex-row w-full items-center rounded-t px-1 border-b focus-within:bg-gray-200"
+      v-bind:class="{
 			'border-blue-400': active && inputError.length < 1,
 			'border-red-600': active && inputError.length > 0
 		}"
-  >
-    <slot name="leading-icon"></slot>
-    <div class="relative flex flex-col w-full">
-      <div class="relative flex flex-col p-1">
-        <label
-          for="input"
-          class="this-select-label absolute text-sm z-10 text-gray-500"
-          v-bind:class="activeLabel"
-        >{{ label }}{{ hasError }}</label>
-        <div class="flex flex-row w-full">
-          <select
-            v-bind:id="name"
-            v-bind:name="name"
-            :required="required"
-            class="this-input bg-transparent focus:outline-none mt-6 z-20 w-full"
-            v-bind:class="{ 'text-red-600': inputError.length > 0 }"
-            @focus="active = true"
-            @blur="validateOnBlur()"
-            @keypress="inputError = ''"
-            v-bind:value="value"
-            v-on:input="$emit('input', $event.target.value)"
-          >
-            <slot></slot>
-          </select>
+    >
+      <slot name="leading-icon"></slot>
+      <div class="relative flex flex-col w-full">
+        <div class="relative flex flex-col p-1">
+          <label
+            for="input"
+            class="this-select-label absolute text-sm z-10 text-gray-500"
+            v-bind:class="activeLabel"
+          >{{ label }}{{ hasError }}</label>
+          <div class="flex flex-row w-full">
+            <select
+              v-bind:id="name"
+              v-bind:name="name"
+              :required="required"
+              class="this-input bg-transparent focus:outline-none mt-6 z-20 w-full"
+              v-bind:class="{ 'text-red-600': inputError.length > 0 }"
+              @focus="active = true"
+              @blur="validateOnBlur()"
+              @keypress="inputError = ''"
+              v-bind:value="value"
+              v-on:input="$emit('input', $event.target.value)"
+            >
+              <slot></slot>
+            </select>
+          </div>
         </div>
       </div>
-      <transition name="fade-left">
+      <slot name="trailing-icon"></slot>
+    </div>
+    <div class="flex relative">
+      <transition name="fade-right">
         <div
           v-if="active && inputError.length < 1"
-          class="this-helper absolute bottom-0 -mb-5 text-gray-600 text-xs md:text-sm font-thin p-1 flex justify-end w-full"
+          class="this-helper absolute top-0 text-gray-600 text-xs font-thin p-1 flex w-full"
         >
           <slot name="helper"></slot>
         </div>
@@ -43,11 +48,10 @@
       <transition name="fade-right">
         <div
           v-if="inputError.length > 0"
-          class="this-error absolute bottom-0 -mb-5 text-red-600 text-xs font-thin p-1"
+          class="this-error absolute top-0 text-red-600 text-xs font-thin p-1 flex w-full"
         >{{ inputError }}</div>
       </transition>
     </div>
-    <slot name="trailing-icon"></slot>
   </div>
 </template>
 <script>
