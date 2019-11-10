@@ -22,7 +22,7 @@
               v-bind:id="name"
               v-bind:name="name"
               :required="required"
-              class="this-input bg-transparent focus:outline-none mt-6 z-20 w-full"
+              class="this-input bg-transparent focus:outline-none mt-7 z-20 w-full"
               v-bind:class="{ 'text-red-600': inputError.length > 0 }"
               @focus="active = true"
               @blur="validateOnBlur()"
