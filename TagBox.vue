@@ -1,5 +1,5 @@
 <template>
-  <div class="relative flex flex-col mb-6">
+  <div class="relative flex flex-col mb-6 w-full" @click="focusOnTag">
     <div
       id="custom-input"
       class="flex flex-row items-center rounded-t px-1 border-b focus-within:bg-gray-200"
@@ -11,28 +11,44 @@
       <slot name="leading-icon"></slot>
       <div class="relative flex flex-col w-full">
         <div class="relative flex flex-col p-1">
+          <input
+            type="hidden"
+            v-bind:name="name"
+            :required="required"
+            v-bind:value="tags"
+          />
           <label
             for="input"
             class="this-input-label absolute text-sm z-10 text-gray-500"
             v-bind:class="activeLabel"
             >{{ label }}{{ hasError }}</label
           >
-          <div class="flex w-full z-20">
-            <input
-              v-bind:id="name"
-              v-bind:type="type === 'currency' ? 'number' : type"
-              v-bind:name="name"
-              v-bind:maxlength="maxlength"
-              v-bind:step="type === 'currency' ? '.01' : 'any'"
-              :required="required"
-              class="this-input bg-transparent focus:outline-none mt-6 w-full p-1"
-              v-bind:class="{ 'text-red-600': inputError.length > 0 }"
-              @focus="active = true"
-              @blur="validateOnBlur()"
-              @keyup="inputError = ''"
-              v-bind:value="value"
-              v-on:input="$emit('input', $event.target.value)"
-            />
+          <div class="z-20 mt-6 flex flex-row flex-wrap items-center">
+            <span
+              class="bg-blue-500 text-white rounded p-1 font-semibold mr-1 mb-1 flex justify-between items-center"
+              v-for="(tag, index) in tags"
+              v-bind:key="index"
+            >
+              <span class="mr-1">{{ tag }}</span>
+              <button class="text-xs" @click="removeTag(tag)">
+                <icon name="times" />
+              </button>
+            </span>
+            <div>
+              <input
+                id="tag_input"
+                v-bind:type="
+                  type !== 'text' || type !== 'number' ? 'text' : type
+                "
+                class="this-input w-full bg-transparent focus:outline-none p-1"
+                v-bind:class="{ 'text-red-600': inputError.length > 0 }"
+                v-model="tag_input"
+                @focus="active = true"
+                @blur="validateOnBlur()"
+                @keyup="inputError = ''"
+                v-on:keyup.188="addTag()"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -62,6 +78,8 @@
 export default {
   data() {
     return {
+      tags: [],
+      tag_input: "",
       active: false,
       hasInput: false,
       inputError: ""
@@ -71,7 +89,7 @@ export default {
     activeLabel() {
       return {
         "text-xs font-semibold mt-0": this.active,
-        "text-base mt-8": !this.active && String(this.value).length < 1,
+        "text-base mt-8": !this.active && this.tags.length < 1,
         "text-red-600": this.inputError.length > 0,
         "text-blue-500": this.inputError.length < 1 && this.active,
         "text-gray-500": this.inputError.length < 1 && !this.active
@@ -84,14 +102,38 @@ export default {
   watch: {
     error() {
       this.inputError = this.error ? this.error[0] : "";
+    },
+    tags(value) {
+      this.$emit("input", value);
     }
   },
   methods: {
     validateOnBlur() {
       this.active = false;
-      if (this.inputError.length > 0 && String(this.value).length > 0) {
+      if (this.inputError.length > 0 && this.tag_input.length > 0) {
         this.inputError = "";
       }
+    },
+    addTag() {
+      let value = this.tag_input;
+      let index = this.tags.findIndex(tag => tag === value);
+      if (index == -1) {
+        setTimeout(() => {
+          this.tags.push(this.stripCommaTag(value));
+          this.tag_input = "";
+        }, 100);
+      } else this.tag_input = this.stripCommaTag(this.tag_input);
+    },
+    removeTag(tag) {
+      var index = this.tags.indexOf(tag);
+      console.log(index);
+      if (index > -1) this.tags.splice(index, 1);
+    },
+    stripCommaTag(value) {
+      return value.substr(0, value.length - 1);
+    },
+    focusOnTag() {
+      document.getElementById("tag_input").focus();
     }
   },
   props: {

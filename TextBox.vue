@@ -4,9 +4,9 @@
       id="custom-input"
       class="flex flex-row w-full items-center rounded-t px-1 border-b focus-within:bg-gray-200"
       v-bind:class="{
-			'border-blue-400': active && inputError.length < 1,
-			'border-red-600': active && inputError.length > 0
-		}"
+        'border-blue-400': active && inputError.length < 1,
+        'border-red-600': active && inputError.length > 0
+      }"
     >
       <slot name="leading-icon"></slot>
       <div class="relative flex flex-col w-full">
@@ -15,7 +15,8 @@
             for="input"
             class="this-input-label absolute text-sm z-10 text-gray-500"
             v-bind:class="activeLabel"
-          >{{ label }}{{ hasError }}</label>
+            >{{ label }}{{ hasError }}</label
+          >
           <div class="flex w-full z-20">
             <textarea
               v-bind:id="name"
@@ -48,7 +49,9 @@
         <div
           v-if="inputError.length > 0"
           class="this-error absolute top-0 text-red-600 text-xs font-thin p-1 flex w-full"
-        >{{ inputError }}</div>
+        >
+          {{ inputError }}
+        </div>
       </transition>
     </div>
   </div>
@@ -114,7 +117,7 @@ export default {
   }
 };
 </script>
-<style>
+<style scoped>
 #custom-input {
   transition: background-color 0.3s ease-out;
   transition: border-color 0.2s ease-in;
