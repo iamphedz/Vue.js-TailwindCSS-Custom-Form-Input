@@ -1,5 +1,5 @@
 <template>
-  <div class="relative flex flex-col mb-6 w-full" @click="focusOnTag">
+  <div class="relative flex flex-col mb-6 w-full">
     <div
       id="custom-input"
       class="flex flex-row items-center rounded-t px-1 border-b focus-within:bg-gray-200"
@@ -9,12 +9,12 @@
       }"
     >
       <slot name="leading-icon"></slot>
-      <div class="relative flex flex-col w-full">
+      <div class="relative flex flex-col w-full" @click="focusOnTag">
         <div class="relative flex flex-col p-1">
           <input
-            type="hidden"
+            style="display: none;"
+            type="text"
             v-bind:name="name"
-            :required="required"
             v-bind:value="tags"
           />
           <label
@@ -25,14 +25,17 @@
           >
           <div class="z-20 mt-6 flex flex-row flex-wrap items-center">
             <span
-              class="bg-blue-500 text-white rounded p-1 font-semibold mr-1 mb-1 flex justify-between items-center"
+              v-bind:class="tagclass"
               v-for="(tag, index) in tags"
               v-bind:key="index"
             >
-              <span class="mr-1">{{ tag }}</span>
-              <button class="text-xs" @click="removeTag(tag)">
-                <icon name="times" />
-              </button>
+              <span class="mr-3">{{ tag }}</span>
+              <span
+                class="cursor-pointer text-xs font-semibold border-l border-blue-300 px-1"
+                @click="removeTag(tag)"
+              >
+                x
+              </span>
             </span>
             <div>
               <input
@@ -47,6 +50,7 @@
                 @blur="validateOnBlur()"
                 @keyup="inputError = ''"
                 v-on:keyup.188="addTag()"
+                v-on:keydown.8="returnLastTag($event)"
               />
             </div>
           </div>
@@ -119,14 +123,18 @@ export default {
       let index = this.tags.findIndex(tag => tag === value);
       if (index == -1) {
         setTimeout(() => {
-          this.tags.push(this.stripCommaTag(value));
-          this.tag_input = "";
+          if (this.maxtag > this.tags.length) {
+            this.tags.push(this.stripCommaTag(value));
+            this.tag_input = "";
+          } else {
+            this.inputError = `Maximum tag count reached (${this.maxtag})`;
+            this.tag_input = this.stripCommaTag(value);
+          }
         }, 100);
       } else this.tag_input = this.stripCommaTag(this.tag_input);
     },
     removeTag(tag) {
       var index = this.tags.indexOf(tag);
-      console.log(index);
       if (index > -1) this.tags.splice(index, 1);
     },
     stripCommaTag(value) {
@@ -134,6 +142,14 @@ export default {
     },
     focusOnTag() {
       document.getElementById("tag_input").focus();
+    },
+    returnLastTag(e) {
+      if (this.tags.length > 0 && this.tag_input.length < 1) {
+        e.preventDefault();
+        var tag = this.tags.slice(-1).pop();
+        this.tag_input = tag;
+        this.tags.pop();
+      }
     }
   },
   props: {
@@ -157,12 +173,23 @@ export default {
         return "text";
       }
     },
-    required: String,
     error: Array,
     maxlength: {
       type: Number | String,
       default() {
         return 255;
+      }
+    },
+    maxtag: {
+      type: Number | String,
+      default() {
+        return 10;
+      }
+    },
+    tagclass: {
+      type: String,
+      default() {
+        return "bg-blue-500 text-white rounded p-1 mr-1 mb-1 flex cursor-default items-center justify-center";
       }
     },
     value: String | Number
@@ -175,7 +202,11 @@ export default {
   transition: border-color 0.2s ease-in;
 }
 .this-input-label {
-  transition: all 0.2s ease;
+  transition: all 0.4s ease;
+}
+
+.this-tags {
+  transition: all 0.3s ease;
 }
 
 /* Enter and leave animations can use different */
